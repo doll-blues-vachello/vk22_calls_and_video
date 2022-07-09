@@ -129,7 +129,15 @@ fun main(args: Array<String>){
 
     }
 
-    parser.subcommands(Task50(), Task40(), Task30())
+    class Task10:Subcommand("10", "Call creating bot"){
+        override fun execute() {
+            val (vk, actor) = getVkApi()
+            task10(vk, actor, "2a8ce4a7cc98160b1f14d81080136b53c3b346d7112d35a07a30d9e82a5dcba235be58e205538b86beffb");
+        }
+
+    }
+
+    parser.subcommands(Task50(), Task40(), Task30(), Task10())
     parser.parse(args)
 
 

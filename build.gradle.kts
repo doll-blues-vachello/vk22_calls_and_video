@@ -15,7 +15,7 @@ repositories {
 dependencies {
     // https://mvnrepository.com/artifact/com.vk.api/sdk
     implementation("com.vk.api:sdk:1.0.14")
-//    implementation("com.github.yvasyliev:java-vk-bots-longpoll-api:3.2.10")
+    implementation("com.github.yvasyliev:java-vk-bots-longpoll-api:3.2.10")
     implementation("org.slf4j:slf4j-jdk14:1.7.26")
     testImplementation(kotlin("test"))
     implementation("io.ktor:ktor-client-core:2.0.3")
