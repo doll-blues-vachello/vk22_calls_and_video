@@ -1,5 +1,5 @@
+@file:OptIn(ExperimentalCli::class)
 package ru.leadpogrommer.vk22.vkbot
-
 //import com.sun.org.apache.xalan.internal.xsltc.compiler.Constants.REDIRECT_URI
 
 //import api.longpoll.bots.LongPollBot
@@ -21,6 +21,7 @@ import io.ktor.client.statement.*
 import io.ktor.util.*
 import javafx.application.Platform
 import javafx.stage.Stage
+import kotlinx.cli.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -69,16 +70,7 @@ fun getCode(): String{
     return _code
 }
 
-data class VideoInfo(val name: String, val image: URI, val views: Int)
-
-fun main(){
-    print("Enter group id or short name:")
-    val groupName = readLine()!!
-    print("Enter maximum number of slides (0 = all):")
-    val numSlides = readLine()!!.toInt()
-    print("Enter output file name:")
-    val filename = readLine()!!
-
+fun getVkApi(): Pair<VkApiClient, UserActor> {
     val transportClient = HttpTransportClient()
     val vk = VkApiClient(transportClient)
 
@@ -99,64 +91,42 @@ fun main(){
 //    println("code=$code;")
 //    val res = vk.oAuth().userAuthorizationCodeFlow(clientId, secret, "https://oauth.vk.com/blank.html", code).execute()
     val actor = UserActor(userId.toInt(), token)
-    val test = vk.groups().getByIdObjectLegacy(actor).groupId(groupName).execute()
-    val groupId = test[0].id
-    println(test.get(0).id)
-
-    val videos = vk.videos().get(actor).ownerId(-groupId).execute()
-//    println(videos)
-
-    val videoInfos = videos.items.map { video->
-        val image = video.image.maxByOrNull { img -> img.height }
-        VideoInfo(video.title, image?.url ?: URI(""), video.views)
-
-    }.sortedByDescending { it.views }.take(if(numSlides == 0)videos.count else numSlides)
-    println(videoInfos)
+    return vk to actor
+}
 
 
-    val imageDir = File("tmp")
-    imageDir.mkdir()
-    imageDir.listFiles()?.forEach {
-        it.delete()
+fun main(args: Array<String>){
+
+
+    val parser = ArgParser("vk22")
+
+    class Task50: Subcommand("50", "Generate trailer for vk group"){
+        override fun execute() {
+            val (vk, actor) = getVkApi()
+            task50(vk, actor)
+        }
+    }
+    class Task40: Subcommand("40", "Calculate comments"){
+        val videoId by argument(ArgType.String, description = "Video id in format ownerid_videoid (example: -213724548_456239017)")
+        val patterns by argument(ArgType.String, description = "Patterns").vararg()
+
+        override fun execute() {
+
+
+            val (vk, actor) = getVkApi()
+            task40(vk, actor, videoId, patterns)
+        }
     }
 
-    runBlocking {
-        val client = HttpClient(CIO)
-        videoInfos.mapIndexed { i, video ->
-            launch(Dispatchers.IO){
-                val res = client.get(video.image.toURL())
-                val img = ImageIO.read(ByteArrayInputStream(res.bodyAsChannel().toByteArray()))
-//                val graphics = img.graphics
-//                graphics.font = Font.createFonts(File("font.ttf")).get(0).deriveFont(50.0f)
-//                graphics.color = Color.WHITE
-//                graphics.drawString(video.name, 10, 10)
-//                img.graphics.ren
-//                img.r
-                println("$i - ${video.name} - views: ${video.views}")
-                ImageIO.write(img, "jpg", File("tmp/${i.toString().padStart(3, '0')}.jpg"))
-            }
-        }.toList().joinAll()
-    }
+    parser.subcommands(Task50(), Task40())
+    parser.parse(args)
 
-    var srtData = ""
-    videoInfos.forEachIndexed{ i, video ->
-        val tstart = i*5
-        val tend = i*5 + 5
-        fun tToS(t: Int) = "${(t/3600).toString().padStart(2, '0')}:${((t/60)%60).toString().padStart(2, '0')}:${(t%60).toString().padStart(2, '0')},000"
-        srtData += "${i+1}\n${tToS(tstart)} --> ${tToS(tend)}\n${video.name}\n\n"
-    }
 
-    File("tmp/srt.srt").writeText(srtData)
+//    task50(vk, actor)
 
-    val ff = FFmpegBuilder()
-        .setInput("tmp/%03d.jpg")
-        .addExtraArgs("-framerate", "1/5")
-        .addOutput(filename)
-        .setVideoFilter("scale=1920:1080,subtitles=tmp/srt.srt")
-        .setFormat("mp4")
-        .setVideoFrameRate(10.0)
-        .done()
-    FFmpegExecutor().createJob(ff).run()
+
+
+
 
 }
 //fun main(){

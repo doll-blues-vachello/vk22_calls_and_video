@@ -22,6 +22,7 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:2.0.3")
     implementation("no.tornado:tornadofx:1.7.20")
     implementation("net.bramp.ffmpeg:ffmpeg:0.7.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.5")
 }
 
 javafx {
