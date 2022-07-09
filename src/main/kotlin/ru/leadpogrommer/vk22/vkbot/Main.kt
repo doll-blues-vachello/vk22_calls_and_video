@@ -118,7 +118,18 @@ fun main(args: Array<String>){
         }
     }
 
-    parser.subcommands(Task50(), Task40())
+    class Task30: Subcommand("30", "Check for new live streams"){
+        val group by argument(ArgType.String, description = "Group short name or id")
+        val timeout by argument(ArgType.Int, description = "Time between updates (in seconds)").optional()
+
+        override fun execute() {
+            val (vk, actor) = getVkApi()
+            task30(vk, actor, group, timeout ?: 60)
+        }
+
+    }
+
+    parser.subcommands(Task50(), Task40(), Task30())
     parser.parse(args)
 
 
