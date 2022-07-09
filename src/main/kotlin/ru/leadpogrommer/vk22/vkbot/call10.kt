@@ -12,36 +12,8 @@ import com.vk.api.sdk.client.actors.UserActor
 import com.vk.api.sdk.httpclient.HttpTransportClient
 import com.vk.api.sdk.objects.docs.responses.SearchResponse
 
-class CallResponse(){
-    @SerializedName("join_link")
-    lateinit var joinLink: String
-
-    @SerializedName("call_id")
-    lateinit var callId: String
-}
-
-class StartCallBuilder(vk: VkApiClient, actor: UserActor): AbstractQueryBuilder<StartCallBuilder, CallResponse>(vk, "messages.startCall", CallResponse::class.java){
 
 
-    init {
-        accessToken(actor.accessToken)
-    }
-
-    fun groupId(id: Int): StartCallBuilder{
-        return unsafeParam("group_id", id)
-    }
-
-    override fun getThis(): StartCallBuilder {
-        return this
-    }
-
-    override fun essentialKeys(): MutableCollection<String> {
-        return mutableListOf("access_token")
-    }
-
-}
-
-// TODO: groupID, use group token
 class HelloBot(val myVk: VkApiClient, val actor: UserActor, val token: String) : LongPollBot() {
     override fun onMessageNew(messageNew: MessageNew) {
         try {

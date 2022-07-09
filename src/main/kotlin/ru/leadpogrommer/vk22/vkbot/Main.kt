@@ -36,7 +36,7 @@ import java.io.File
 import java.net.URI
 import javax.imageio.ImageIO
 
-
+// TODO: operators must open group dialogue
 const val clientId = 8214775
 const val secret = "WhdSyfWe2c8rEB8AtQ7M"
 
@@ -134,10 +134,21 @@ fun main(args: Array<String>){
             val (vk, actor) = getVkApi()
             task10(vk, actor, "2a8ce4a7cc98160b1f14d81080136b53c3b346d7112d35a07a30d9e82a5dcba235be58e205538b86beffb");
         }
+    }
+
+    // TODO: test on multiple operators/users
+    // TODO: operators to cli
+    class Task20:Subcommand("20", "Call creating bot"){
+        override fun execute() {
+            val (vk, actor) = getVkApi()
+            task20(vk, actor, "2a8ce4a7cc98160b1f14d81080136b53c3b346d7112d35a07a30d9e82a5dcba235be58e205538b86beffb",
+            listOf("ex4to")
+            );
+        }
 
     }
 
-    parser.subcommands(Task50(), Task40(), Task30(), Task10())
+    parser.subcommands(Task50(), Task40(), Task30(), Task10(), Task20())
     parser.parse(args)
 
 
