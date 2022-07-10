@@ -51,6 +51,8 @@
 ``java -jar build/libs/vk_bot_kt-1.0-SNAPSHOT-all.jar --clientID <client_id> --secret <secrret> 40 -213724548_456239017  '!\s*no' '!\s*yes'``
 
 ## 50 баллов
+**Для работы прилжения необходим ffmpeg в PATH**
+
 ```java -jar build/libs/vk_bot_kt-1.0-SNAPSHOT-all.jar --clientID <client_id> --secret <secret> 50 <group_id> <num_slides> <filename>```
 
 
