@@ -7,10 +7,7 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.util.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import net.bramp.ffmpeg.FFmpegExecutor
 import net.bramp.ffmpeg.builder.FFmpegBuilder
 import java.io.ByteArrayInputStream
@@ -20,6 +17,7 @@ import javax.imageio.ImageIO
 
 data class VideoInfo(val name: String, val image: URI, val views: Int)
 
+@OptIn(DelicateCoroutinesApi::class)
 fun task50(vk: VkApiClient, actor: UserActor, groupName: String, numSlides: Int, filename: String){
     val test = vk.groups().getByIdObjectLegacy(actor).groupId(groupName).execute()
     val groupId = test[0].id
@@ -44,8 +42,9 @@ fun task50(vk: VkApiClient, actor: UserActor, groupName: String, numSlides: Int,
 
     runBlocking {
         val client = HttpClient(CIO)
+        val ctx = newFixedThreadPoolContext(4, "Image processing")
         videoInfos.mapIndexed { i, video ->
-            launch(Dispatchers.IO){
+            launch(ctx){
                 val res = client.get(video.image.toURL())
                 val img = ImageIO.read(ByteArrayInputStream(res.bodyAsChannel().toByteArray()))
 //                val graphics = img.graphics
