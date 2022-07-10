@@ -20,15 +20,7 @@ import javax.imageio.ImageIO
 
 data class VideoInfo(val name: String, val image: URI, val views: Int)
 
-fun task50(vk: VkApiClient, actor: UserActor){
-    print("Enter group id or short name:")
-    val groupName = readLine()!!
-    print("Enter maximum number of slides (0 = all):")
-    val numSlides = readLine()!!.toInt()
-    print("Enter output file name:")
-    val filename = readLine()!!
-
-
+fun task50(vk: VkApiClient, actor: UserActor, groupName: String, numSlides: Int, filename: String){
     val test = vk.groups().getByIdObjectLegacy(actor).groupId(groupName).execute()
     val groupId = test[0].id
     println(test.get(0).id)

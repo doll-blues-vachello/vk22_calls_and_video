@@ -141,3 +141,7 @@ gradle-app.setting
 code.txt
 tmp/
 *.mp4
+
+# because there are secrets
+docker-compose.yml
+tokens.txt
